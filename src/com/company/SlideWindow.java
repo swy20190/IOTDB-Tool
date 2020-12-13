@@ -29,7 +29,18 @@ public class SlideWindow {
         sum_of_sq += new_time*new_time;
     }
 
-    public double probabilityLater(long t){
+    public double phi(long now_time){
+        // 注意这里的now_time是减去1600000000000的
+        long latest_time = time_queue.get(time_queue.size()-1);
+        return -1.0 * Math.log10(probabilityLater(now_time - latest_time));
+    }
 
+    private double probabilityLater(long t){
+
+        double mean =  (double) sum_of_stamp / (double) time_queue.size();
+        double sigma_sq = (sum_of_sq + time_queue.size() * mean * mean - 2.0 * mean * sum_of_stamp) / (double) time_queue.size();
+        double sigma = Math.sqrt(sigma_sq);
+        NormalDistribution normalDistribution = new NormalDistribution(mean, sigma);
+        return 1.0 - normalDistribution.cumulativeProbability(t);
     }
 }
